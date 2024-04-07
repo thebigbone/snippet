@@ -3,12 +3,11 @@ package main
 import (
 	"fmt"
 	"html/template"
-	"log"
 	"net/http"
 	"strconv"
 )
 
-func home(w http.ResponseWriter, r *http.Request) {
+func (app *applicaton) home(w http.ResponseWriter, r *http.Request) {
 	files := []string{
 		"/home/syscall/snippet/ui/html/base.html",
 		"/home/syscall/snippet/ui/html/pages/home.html",
@@ -18,7 +17,7 @@ func home(w http.ResponseWriter, r *http.Request) {
 	ts, err := template.ParseFiles(files...)
 
 	if err != nil {
-		log.Println(err.Error())
+		app.errorLog.Println(err.Error())
 
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
@@ -26,12 +25,12 @@ func home(w http.ResponseWriter, r *http.Request) {
 
 	err = ts.ExecuteTemplate(w, "base", nil)
 	if err != nil {
-		log.Println(err.Error())
+		app.errorLog.Println(err.Error())
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 	}
 
 }
-func snippetView(w http.ResponseWriter, r *http.Request) {
+func (app *applicaton) snippetView(w http.ResponseWriter, r *http.Request) {
 	get_id := r.URL.Query().Get("id")
 
 	id, err := strconv.Atoi(get_id)
@@ -42,7 +41,7 @@ func snippetView(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Fprintf(w, "display a specific snippet with ID %d...", id)
 }
-func snippetCreate(w http.ResponseWriter, r *http.Request) {
+func (app *applicaton) snippetCreate(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		w.Header().Set("Allow", http.MethodPost)
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
